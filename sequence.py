@@ -51,6 +51,14 @@ class SequenceGenerator():
 
 
 def plot_output(output, title, x_axis_label, y_axis_label):
+  """Plots the output with labels.
+  
+  Args:
+    output: dictionary of output
+    title: string title to be put on graph.
+    x_axis_label: string label for x (horizontal) axis.
+    y_axis_label: string label for y (vertical) axis.
+  """
   df = pandas.DataFrame(output)
   df.reindex_axis(sorted(df.columns), axis=1) 
   df.plot()
@@ -75,6 +83,7 @@ def setup_generator_dict():
 
 
 def convergence_experiment():
+  """Runs the experiment to test the convergence of the series."""
   generator_dict = setup_generator_dict()
   output = {}
   for i in range(40):
@@ -92,6 +101,7 @@ def convergence_experiment():
 
 
 def timing_experiment():
+  """Runs the experiment to test the timings."""
   repetitions =100000
   generator_dict = setup_generator_dict()
   output = {}
@@ -107,4 +117,5 @@ def timing_experiment():
 
 
 if __name__ == '__main__':
-  timing_experiment()
+ convergence_experiment()
+ timing_experiment()
