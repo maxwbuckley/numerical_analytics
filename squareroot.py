@@ -52,9 +52,11 @@ class SquareRootGenerator(object):
             self.a**self.numeric()(1/2)))
     # Need to set initial approximation guess. Using formula from wikipedia
     if a < 10:
-      self.approximations = [self.numeric()(2) * (10 ** math.floor(math.log(a, 10)/2))]
+      self.approximations = [
+          self.numeric()(2) * (10 ** math.floor(math.log(a, 10)/2))]
     else:
-      self.approximations = [self.numeric()(6) * (10 ** math.floor(math.log(a, 10)/2))]
+      self.approximations = [
+          self.numeric()(6) * (10 ** math.floor(math.log(a, 10)/2))]
     self.errors = []
     self._square_root()
 
@@ -85,10 +87,7 @@ class SquareRootGenerator(object):
     Stops on multiple conditions.
 
     Args:
-      a: float
-      x: float
-      max_iterations: integer
-      iteration: integer
+      iteration: integer for which iteration we are on.
 
     Returns:
       boolean if we should stop.
@@ -111,8 +110,9 @@ class SquareRootGenerator(object):
     df = pandas.DataFrame({"Errors": [
         float(error) for error in self.errors]})
     df.plot()
-    plt.title("Errors from subsequent approximations of square root of %s" %
-               self.a)
+    version = "Decimal" if self.decimal else "Float"
+    plt.title("Errors from subsequent approximations of square root of %s "
+              "for %s system" % (self.a, version))
     plt.ylabel("Absolute error")
     plt.xlabel("Iteration number")
     plt.show()
@@ -122,8 +122,9 @@ class SquareRootGenerator(object):
     df = pandas.DataFrame({"Approximations": [
         float(approximation) for approximation in self.approximations]})
     df.plot()
-    plt.title("Approximations of square root of %s" %
-               self.a)
+    version = "Decimal" if self.decimal else "Float"
+    plt.title("Approximations of square root of %s for %s system" % (
+               self.a, version))
     plt.ylabel("Approximation")
     plt.xlabel("Iteration number")
     plt.axhline(self.a**self.numeric()(1/2), color="r")
@@ -131,10 +132,10 @@ class SquareRootGenerator(object):
 
 
 if __name__ == '__main__':
-  decimal_desired = False
-  float_desired = True
+  decimal_desired = True
+  float_desired = False
   if decimal_desired:
-    Generator = SquareRootGenerator(15348, 100, 10**-1000, True, 1024)
+    Generator = SquareRootGenerator(15348, 25, 10 ** -100000, True, 5000)
     print([(i, error) for i, error in enumerate(Generator.errors)])
     print([(i, error) for i, error in enumerate(Generator.approximations)])
     print(Generator.approximations)
