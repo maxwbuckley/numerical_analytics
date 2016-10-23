@@ -17,15 +17,27 @@ class SequenceGenerator():
     Args:
       is_decimal: boolean of wheter to use decimal.Decimal rather than float.
       precision: integer of how many digits of precision to use.
+    Raises:
+      ValueError if is_decimal is True without passing a precision value.
     """
-    if decimal and precision:
+    # Default value
+    self.decimal = False
+    if is_decimal and not precision:
+      raise ValueError("You cannot use decimal without specifying an integer "
+                       "precision value") 
+    elif is_decimal:
       self.decimal = True
       self.precision = precision
-      self.values = [decimal.Decimal(4.0), decimal.Decimal(4.25)]
-    else:
-      self.decimal = False
-      self.values = [4.0, 4.25]
+    self.values = [self.numeric()(4.0), self.numeric()(4.25)]
 
+
+  def numeric(self):
+    """Returns the numeric type we want for computations.
+    
+    Either decimal or float depending on the generator settings
+    """ 
+    if self.decimal: return decimal.Decimal
+    return float
 
   def get_value(self, n):
     """Returns the nth value in the sequence.
@@ -37,15 +49,13 @@ class SequenceGenerator():
           whether computation is done in Decimal for ease of plotting later.
     """
     while n >= len(self.values):
-      i = len(self.values)
       if self.decimal:
         # Precision is set module wide so need to reset for each series.
         decimal.getcontext().prec = self.precision 
-        new_value = (
-            decimal.Decimal(108) - (decimal.Decimal(815) -decimal.Decimal(1500)/
-            self.values[i-2])/self.values[i-1])
-      else:
-        new_value = 108 - (815 -1500 / self.values[i-2]) / self.values[i-1]
+      new_value = (
+          self.numeric()(108) - (self.numeric()(815) -self.numeric()(1500)/
+          self.values[-2])/self.values[-1])
+      # We store the decimal value as appropriate.
       self.values.append(new_value)
     return float(self.values[n])
 
@@ -88,7 +98,6 @@ def convergence_experiment():
   output = {}
   for i in range(40):
     #default_time = timeit.Timer(lambda: default_generator.get_value(i))
-    #print(default_time.timeit(number=1000))
     for key in generator_dict.keys():
       output.setdefault(key, []).append(
           generator_dict[key].get_value(i))
@@ -102,7 +111,7 @@ def convergence_experiment():
 
 def timing_experiment():
   """Runs the experiment to test the timings."""
-  repetitions =100000
+  repetitions = 100000
   generator_dict = setup_generator_dict()
   output = {}
   for i in range(40):
